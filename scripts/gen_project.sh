@@ -29,3 +29,9 @@ echo -e "int main(void)\n{\n\treturn (0);\n}" > srcs/main.c
 echo -e "${GREEN}Generating .gitignore...${NC}"
 
 sed "s/{{name}}/$PROJECT_NAME/g" libft/scripts/templates/.gitignore.template > .gitignore
+
+echo -e "${GREEN}Generating github pipeline...${NC}"
+
+mkdir -p .github/workflows
+
+sed "s/{{name}}/$PROJECT_NAME/g" libft/scripts/templates/test.yml.template > .github/workflows/test.yml
