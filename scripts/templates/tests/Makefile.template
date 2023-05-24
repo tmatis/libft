@@ -1,0 +1,28 @@
+NAME = .tests
+CC = cc
+CFLAGS := -Wall -Wextra -Werror -g
+LIBFTDIR := libft
+LIBFT := $(LIBFTDIR)/libft.a
+LIBFTINC := $(LIBFTDIR)/includes
+LIBS := -L $(LIBFTDIR) -lft
+
+OBJSDIR := .build/tests
+
+SRCS :=  .test_main.c {{srcs}}
+
+
+OBJS := $(addprefix $(OBJSDIR)/, $(SRCS:.c=.o)) {{objs}}
+
+all: $(NAME)
+
+$(LIBFT):
+	$(MAKE) -C $(LIBFTDIR)
+
+$(OBJSDIR)/%.o: %.c
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS) -I $(LIBFTINC) -c $< -o $@
+
+$(NAME): $(LIBFT) $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
+
+

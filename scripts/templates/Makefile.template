@@ -1,0 +1,74 @@
+NAME := {{name}}
+CC := cc
+CFLAGS := -Wall -Wextra -Werror
+LIBFTDIR := libft
+LIBFT := $(LIBFTDIR)/libft.a
+LIBFTINC := $(LIBFTDIR)/includes
+LIBS := -L $(LIBFTDIR) -lft
+
+ifneq ($(filter debug redebug,$(MAKECMDGOALS)),)
+	CFLAGS += -g
+endif
+
+SRCSDIR := srcs
+OBJSDIR_RELEASE := .build/release
+OBJSDIR_DEBUG := .build/debug
+INCDIR := includes
+
+SRCS_MAIN := main.c
+
+SRCS :=
+
+OBJS_MAIN_RELEASE := $(addprefix $(OBJSDIR_RELEASE)/,$(SRCS_MAIN:.c=.o))
+OBJS_MAIN_DEBUG := $(addprefix $(OBJSDIR_DEBUG)/,$(SRCS_MAIN:.c=.o))
+OBJS_RELEASE := $(addprefix $(OBJSDIR_RELEASE)/,$(SRCS:.c=.o))
+OBJS_DEBUG := $(addprefix $(OBJSDIR_DEBUG)/,$(SRCS:.c=.o))
+
+ALL_SRCS := $(SRCS) $(SRCS_MAIN)
+
+DEPS_RELEASE := $(addprefix $(OBJSDIR_RELEASE)/,$(ALL_SRCS:.c=.d))
+DEPS_DEBUG := $(addprefix $(OBJSDIR_DEBUG)/,$(ALL_SRCS:.c=.d))
+
+DFLAGS	= -MMD -MF $(@:.o=.d)
+
+NAME_DEBUG := $(NAME)_debug
+
+all: $(NAME)
+
+$(LIBFT):
+	$(MAKE) -C $(LIBFTDIR)
+
+$(NAME): $(LIBFT) $(OBJS_RELEASE) $(OBJS_MAIN_RELEASE)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS_RELEASE) $(OBJS_MAIN_RELEASE) $(LIBS)
+
+$(NAME_DEBUG): $(LIBFT) $(OBJS_DEBUG) $(OBJS_MAIN_DEBUG)
+	$(CC) $(CFLAGS) -o $(NAME_DEBUG) $(OBJS_DEBUG) $(OBJS_MAIN_DEBUG) $(LIBS)
+
+debug: $(NAME_DEBUG)
+
+unit: $(LIBFT) $(OBJS_DEBUG)
+	libft/scripts/car.sh $(OBJS_DEBUG)
+
+-include $(DEPS_RELEASE)
+$(OBJSDIR_RELEASE)/%.o: $(SRCSDIR)/%.c
+	@mkdir -p $(OBJSDIR_RELEASE)
+	$(CC) $(CFLAGS) -I $(INCDIR) -I $(LIBFTINC) $(DFLAGS) -c $< -o $@
+
+-include $(DEPS_DEBUG)
+$(OBJSDIR_DEBUG)/%.o: $(SRCSDIR)/%.c
+	@mkdir -p $(OBJSDIR_DEBUG)
+	$(CC) $(CFLAGS) -I $(INCDIR) -I $(LIBFTINC) $(DFLAGS) -c $< -o $@
+
+clean:
+	make -C $(LIBFTDIR) clean
+	rm -rf .build
+
+fclean: clean
+	make -C $(LIBFTDIR) fclean
+	rm -f $(NAME) $(NAME_DEBUG)
+
+re: fclean all
+
+redebug: fclean debug
+
+.PHONY: all clean fclean re debug redebug

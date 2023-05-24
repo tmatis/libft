@@ -1,0 +1,10 @@
+# vscode files
+/.vscode
+
+# generated files
+
+*.o
+*.a
+*.d
+*.so
+*.out

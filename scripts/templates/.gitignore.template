@@ -1,0 +1,19 @@
+# Executable
+
+{{name}}
+{{name}}_debug
+
+# Libraries
+
+*.so
+*.a
+*.dylib
+
+# Compiled
+
+*.o
+*.d
+
+# Editor
+
+/.vscode
